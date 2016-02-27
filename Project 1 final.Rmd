@@ -1,0 +1,69 @@
+---
+title: "Untitled"
+author: "Jeff Nieman"
+date: "February 17, 2016"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+#Project 1  Jeff Nieman  Data 607
+
+#Setup by loading packages
+require(XML)
+require(stringr)
+require(plyr)
+require(ggplot2)
+
+#Raw data is in a github for reproducibility.  Download it and bring it into R using read.delim.
+theURL <- "https://raw.githubusercontent.com/jeffnieman11/chess_rankings/master/Chess%20Rankings.txt"
+chess2 <- read.delim(theURL, header= FALSE, stringsAsFactors = FALSE)
+str(chess2)
+chess2
+
+#Create odd and even row data frames
+odd<- chess2[c(5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,74,77,80,83,86,89,92,95,98,101,104,107,110,113,116,119,122,125,128,131,134,137,140,143,146,149,152,155,158,161,164,167,170,173,176,179,182,185,188,191,194),]
+even<- chess2[c(6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,150,153,156,159,162,165,168,171,174,177,180,183,186,189,192,195),]
+
+#Combine extracts into complete rows and extract
+combo <- paste(odd,even)
+extract<- str_extract_all(combo, "[:alpha:][:alpha:]+|[0-9.]+")
+head(extract)
+
+#Use lapply to create a data frame.
+b <- do.call("rbind.fill", lapply(extract, data.frame, stringsAsFactors = FALSE))
+
+
+#Create vectors for each required field except for average opponent
+NameID <-c(1:64)
+
+Player <-c(paste(b[2,], b[3,]), paste(b[18,], b[19,]), paste(b[34,], b[35,]), paste(b[50,], b[51,]), paste(b[66,], b[67,]), paste(b[82,], b[83,]), paste(b[98,], b[99,], b[100,]), paste(b[115,], b[116,]), paste(b[133,], b[134,]), paste(b[149,], b[150,]), paste(b[165,], b[166,], b[167,], b[168,]), paste(b[183,], b[184,]), paste(b[198,], b[199,]), paste(b[215,], b[216,]), paste(b[231,], b[232,], b[233,]), paste(b[250,], b[251,]), paste(b[264,], b[265,]), paste(b[280,], b[281,]), paste(b[296,], b[297,]), paste(b[312,], b[313,]), paste(b[328,], b[329,]), paste(b[346,], b[347,]), paste(b[361,], b[362,]), paste(b[376,], b[377,]), paste(b[392,], b[393,]), paste(b[408,], b[409,]), paste(b[424,], b[425,]), paste(b[439,], b[440,], b[441,], b[442,]), paste(b[457,], b[458,]), paste(b[474,], b[475,], b[476,]), paste(b[490,], b[491,]), paste(b[505,], b[506,], b[507,]), paste(b[522,], b[523,]), paste(b[537,], b[538,], b[539,]), paste(b[553,], b[554,], b[555,]), paste(b[569,], b[570,]), paste(b[584,], b[585,]), paste(b[599,], b[600,]), paste(b[614,], b[615,]), paste(b[631,], b[632,]), paste(b[646,], b[647,], b[648,]), paste(b[661,], b[662,]), paste(b[676,], b[677,], b[678,]), paste(b[692,], b[693,]), paste(b[706,], b[707,]), paste(b[721,], b[722,]), paste(b[739,], b[740,]), paste(b[754,], b[755,]), paste(b[767,], b[768,]), paste(b[782,], b[783,]), paste(b[796,], b[797,]), paste(b[811,], b[812,]), paste(b[827,], b[828,]), paste(b[838,], b[839,]), paste(b[852,], b[853,]), paste(b[866,], b[867,]), paste(b[879,], b[880,]), paste(b[893,], b[894,]), paste(b[907,], b[908,], b[909,]), paste(b[922,], b[923,]), paste(b[935,], b[936,]), paste(b[952,], b[953,]), paste(b[961,], b[962,], b[963,]), paste(b[975,], b[976,]))
+
+State <- c(b[12,], b[28,], b[44,], b[60,], b[76,], b[92,], b[109,], b[125,], b[143,], b[159,], b[177,], b[192,], b[209,], b[225,], b[242,], b[258,], b[274,], b[290,], b[306,], b[322,], b[339,], b[355,], b[371,], b[386,], b[402,], b[418,], b[433,], b[451,], b[466,], b[485,], b[500,], b[516,], b[532,], b[548,], b[564,], b[578,], b[592,], b[608,], b[624,], b[641,], b[654,], b[671,], b[687,], b[701,], b[716,], b[732,], b[749,], b[762,], b[775,], b[791,], b[806,], b[821,], b[833,], b[847,], b[861,], b[874,], b[888,], b[902,], b[917,], b[930,], b[945,], b[956,], b[970,], b[985,])
+
+Points <- c(b[4,], b[20,], b[36,], b[52,], b[68,], b[84,], b[101,], b[117,], b[135,], b[151,], b[169,], b[185,], b[201,], b[217,], b[234,], b[252,], b[266,], b[282,], b[298,], b[314,], b[331,], b[348,], b[363,], b[378,], b[394,], b[410,], b[426,], b[443,], b[459,], b[477,], b[492,], b[508,], b[524,], b[540,], b[556,], b[571,], b[586,], b[601,], b[616,], b[633,], b[649,], b[663,], b[679,], b[694,], b[708,], b[724,], b[741,], b[756,], b[769,], b[784,], b[798,], b[813,], b[829,], b[840,], b[854,], b[868,], b[881,], b[895,], b[910,], b[924,], b[937,], b[954,], b[964,], b[977,])
+
+Prerating <- c(b[14,], b[30,], b[46,], b[62,], b[78,], b[94,], b[111,], b[127,], b[145,], b[161,], b[179,], b[194,], b[211,], b[227,], b[244,], b[260,], b[276,], b[292,], b[308,], b[324,], b[341,], b[357,], b[373,], b[388,], b[404,], b[420,], b[435,], b[453,], b[468,], b[487,], b[502,], b[518,], b[534,], b[550,], b[566,], b[580,], b[594,], b[610,], b[626,], b[643,], b[656,], b[673,], b[689,], b[703,], b[718,], b[736,], b[751,], b[764,], b[777,], b[793,], b[808,], b[823,], b[835,], b[849,], b[863,], b[876,], b[890,], b[904,], b[919,], b[932,], b[947,], b[958,], b[972,], b[987,])
+
+#Combine vectors and use the data frame to create a new vector with the average opponent rating.
+chessmaster <- data.frame(NameID, Player, State, Points, Prerating)
+
+Opponent <-  c(mean(as.numeric(paste(chessmaster[b[5:11,],5]))), mean(as.numeric(paste(chessmaster[b[21:27,],5]))), mean(as.numeric(paste(chessmaster[b[37:43,],5]))), mean(as.numeric(paste(chessmaster[b[53:59,],5]))), mean(as.numeric(paste(chessmaster[b[69:75,],5]))), mean(as.numeric(paste(chessmaster[b[85:91,],5]))), mean(as.numeric(paste(chessmaster[b[102:108,],5]))), mean(as.numeric(paste(chessmaster[b[118:124,],5]))), mean(as.numeric(paste(chessmaster[b[136:142,],5]))), mean(as.numeric(paste(chessmaster[b[152:158,],5]))), mean(as.numeric(paste(chessmaster[b[170:176,],5]))), mean(as.numeric(paste(chessmaster[b[186:191,],5]))), mean(as.numeric(paste(chessmaster[b[202:208,],5]))), mean(as.numeric(paste(chessmaster[b[218:224,],5]))), mean(as.numeric(paste(chessmaster[b[235:241,],5]))), mean(as.numeric(paste(chessmaster[b[253:257,],5]))), mean(as.numeric(paste(chessmaster[b[267:273,],5]))), mean(as.numeric(paste(chessmaster[b[283:289,],5]))), mean(as.numeric(paste(chessmaster[b[299:305,],5]))), mean(as.numeric(paste(chessmaster[b[315:321,],5]))), mean(as.numeric(paste(chessmaster[b[332:337,],5]))), mean(as.numeric(paste(chessmaster[b[349:354,],5]))), mean(as.numeric(paste(chessmaster[b[364:370,],5]))), mean(as.numeric(paste(chessmaster[b[379:385,],5]))), mean(as.numeric(paste(chessmaster[b[395:401,],5]))), mean(as.numeric(paste(chessmaster[b[411:417,],5]))), mean(as.numeric(paste(chessmaster[b[427:432,],5]))), mean(as.numeric(paste(chessmaster[b[444:450,],5]))), mean(as.numeric(paste(chessmaster[b[460:465,],5]))), mean(as.numeric(paste(chessmaster[b[478:484,],5]))), mean(as.numeric(paste(chessmaster[b[493:499,],5]))), mean(as.numeric(paste(chessmaster[b[509:515,],5]))), mean(as.numeric(paste(chessmaster[b[525:531,],5]))), mean(as.numeric(paste(chessmaster[b[541:547,],5]))), mean(as.numeric(paste(chessmaster[b[557:563,],5]))), mean(as.numeric(paste(chessmaster[b[572:577,],5]))), mean(as.numeric(paste(chessmaster[b[587:591,],5]))), mean(as.numeric(paste(chessmaster[b[602:607,],5]))), mean(as.numeric(paste(chessmaster[b[617:623,],5]))), mean(as.numeric(paste(chessmaster[b[634:640,],5]))), mean(as.numeric(paste(chessmaster[b[650:653,],5]))), mean(as.numeric(paste(chessmaster[b[664:670,],5]))), mean(as.numeric(paste(chessmaster[b[680:686,],5]))), mean(as.numeric(paste(chessmaster[b[695:700,],5]))), mean(as.numeric(paste(chessmaster[b[709:715,],5]))), mean(as.numeric(paste(chessmaster[b[725:731,],5]))), mean(as.numeric(paste(chessmaster[b[742:748,],5]))), mean(as.numeric(paste(chessmaster[b[757:761,],5]))), mean(as.numeric(paste(chessmaster[b[770:774,],5]))), mean(as.numeric(paste(chessmaster[b[785:790,],5]))), mean(as.numeric(paste(chessmaster[b[799:805,],5]))), mean(as.numeric(paste(chessmaster[b[814:820,],5]))), mean(as.numeric(paste(chessmaster[b[830:832,],5]))), mean(as.numeric(paste(chessmaster[b[841:846,],5]))), mean(as.numeric(paste(chessmaster[b[855:860,],5]))), mean(as.numeric(paste(chessmaster[b[869:873,],5]))), mean(as.numeric(paste(chessmaster[b[882:887,],5]))), mean(as.numeric(paste(chessmaster[b[896:901,],5]))), mean(as.numeric(paste(chessmaster[b[911:916,],5]))), mean(as.numeric(paste(chessmaster[b[925:929,],5]))), mean(as.numeric(paste(chessmaster[b[938:944,],5]))), mean(as.numeric(paste(chessmaster[b[955,],5]))), mean(as.numeric(paste(chessmaster[b[965:969,],5]))), mean(as.numeric(paste(chessmaster[b[978:984,],5]))))
+               
+#Create Master Data Frame
+chessmaster <- data.frame(Player, State, Points, Prerating, Opponent)
+chessmaster
+
+#Write and test .csv output
+write.csv(chessmaster, file = "chessmaster.csv")
+read.csv("chessmaster.csv")
+
+#Simple plot showing three variables to see if the pre-tournament ratings influenced results
+ggplot(aes(x=Points, y=Prerating), data=chessmaster)+geom_point(color=Opponent)
+
+
+```
